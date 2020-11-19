@@ -1,0 +1,288 @@
+Microsoft Windows [Version 6.3.9600]
+(c) 2013 Microsoft Corporation. Tüm hakları saklıdır.
+
+C:\Windows\system32>spark-shell
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.spark.unsafe.Platform (file:/C:
+/spark-3.0.1-bin-hadoop2.7/jars/spark-unsafe_2.12-3.0.1.jar) to constructor java
+.nio.DirectByteBuffer(long,int)
+WARNING: Please consider reporting this to the maintainers of org.apache.spark.u
+nsafe.Platform
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflect
+ive access operations
+WARNING: All illegal access operations will be denied in a future release
+20/11/19 23:12:49 WARN NativeCodeLoader: Unable to load native-hadoop library fo
+r your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
+l(newLevel).
+Spark context Web UI available at http://Canbek:4040
+Spark context available as 'sc' (master = local[*], app id = local-1605816780790
+).
+Spark session available as 'spark'.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 3.0.1
+      /_/
+
+Using Scala version 2.12.10 (Java HotSpot(TM) 64-Bit Server VM, Java 10.0.2)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> val caseDF = spark.read.option("header","true").option("delimiter", "|").
+csv("C:/Users/Giray/Desktop/case.csv")
+[Stage 0:>                                                          (0 + 1) / 1]
+
+caseDF: org.apache.spark.sql.DataFrame = [date: string, productId: string ... 2
+more fields]
+
+scala> 20/11/19 23:13:19 WARN ProcfsMetricsGetter: Exception when trying to comp
+ute pagesize, as a result reporting of ProcessTree metrics is stopped
+
+
+scala>
+
+scala>
+
+scala> val caseDF = spark.read.option("header","true").option("delimiter", "|").
+csv("C:/Users/Giray/Desktop/case.csv")
+caseDF: org.apache.spark.sql.DataFrame = [date: string, productId: string ... 2
+more fields]
+
+scala> caseDF.printSchema
+root
+ |-- date: string (nullable = true)
+ |-- productId: string (nullable = true)
+ |-- eventName: string (nullable = true)
+ |-- userId: string (nullable = true)
+
+
+scala> caseDF.show(5)
++----------+---------+---------+------+
+|      date|productId|eventName|userId|
++----------+---------+---------+------+
+|1535816823|      496|     view|    13|
+|1536392928|      496|      add|    69|
+|1536272308|      644|     view|    16|
+|1536757406|      164|   remove|    86|
+|1536685863|      618|      add|    33|
++----------+---------+---------+------+
+only showing top 5 rows
+
+
+scala> caseDF.createTempView("UserActivities")
+
+scala> val output1 = spark.sql( "SELECT productId||'|'||count(*) as ProductViewC
+ounts from UserActivities where eventName = 'view' group by productId" )
+output1: org.apache.spark.sql.DataFrame = [ProductViewCounts: string]
+
+scala> output1.show()
+[Stage 3:>                                                          (0 + 1) / 1]
+
++-----------------+
+|ProductViewCounts|
++-----------------+
+|            919|1|
+|            666|1|
+|            447|1|
+|            475|1|
+|            334|1|
+|            205|1|
+|            740|1|
+|            272|2|
+|            700|2|
+|            714|1|
+|            154|2|
+|            317|1|
+|            521|2|
+|            979|1|
+|            685|1|
+|            361|2|
+|            961|1|
+|            823|1|
+|            703|2|
+|            586|2|
++-----------------+
+only showing top 20 rows
+
+
+scala> val output2 = spark.sql( "SELECT eventName||'|'||count(*) as EventCounts
+from UserActivities group by eventName")
+output2: org.apache.spark.sql.DataFrame = [EventCounts: string]
+
+scala> output2.show()
+[Stage 16:=======================>                               (42 + 4) / 100]
+[Stage 16:===============================>                       (57 + 4) / 100]
+[Stage 16:========================================>              (73 + 4) / 100]
+[Stage 16:=================================================>     (90 + 4) / 100]
+
+[Stage 18:==============================>                         (41 + 4) / 75]
+[Stage 18:============================================>           (59 + 4) / 75]
+[Stage 18:====================================================>   (70 + 4) / 75]
+
++-----------+
+|EventCounts|
++-----------+
+|    add|274|
+| remove|328|
+|   view|308|
+|  click|290|
++-----------+
+
+
+scala> val output3 = spark.sql( "SELECT distinct userId FROM (SELECT userId, eve
+ntName, count(*) from UserActivities group by userId, eventName having count(*)
+> 3) LIMIT 5")
+output3: org.apache.spark.sql.DataFrame = [userId: string]
+
+scala> output3.show()
+[Stage 19:>                                                         (0 + 1) / 1]
+[Stage 20:====>                                                  (16 + 4) / 200]
+[Stage 20:=======>                                               (26 + 4) / 200]
+[Stage 20:=======>                                               (28 + 4) / 200]
+[Stage 20:=======>                                               (29 + 4) / 200]
+[Stage 20:==========>                                            (38 + 4) / 200]
+[Stage 20:=============>                                         (48 + 4) / 200]
+[Stage 20:===============>                                       (58 + 4) / 200]
+[Stage 20:==================>                                    (69 + 4) / 200]
+[Stage 20:=====================>                                 (79 + 4) / 200]
+[Stage 20:=========================>                             (91 + 4) / 200]
+[Stage 20:============================>                         (104 + 4) / 200]
+[Stage 20:===============================>                      (117 + 4) / 200]
+[Stage 20:==================================>                   (128 + 4) / 200]
+[Stage 20:======================================>               (144 + 4) / 200]
+[Stage 20:===========================================>          (161 + 4) / 200]
+[Stage 20:===============================================>      (175 + 5) / 200]
+
++------+
+|userId|
++------+
+|    15|
+|    11|
+|    29|
+|    69|
+|    42|
++------+
+
+
+scala> val output4 = spark.sql("SELECT eventName||'|'||count(*) as user47Events
+from UserActivities where userId = '47' group by eventName")
+output4: org.apache.spark.sql.DataFrame = [user47Events: string]
+
+scala> output4.show()
++------------+
+|user47Events|
++------------+
+|       add|5|
+|    remove|4|
+|      view|6|
+|     click|1|
++------------+
+
+
+scala> val output5 = spark.sql("SELECT distinct productId from UserActivities wh
+ere userId = '47' and eventName = 'view'")
+output5: org.apache.spark.sql.DataFrame = [productId: string]
+
+scala> output5.show()
++---------+
+|productId|
++---------+
+|      447|
+|      154|
+|      421|
+|      649|
+|      834|
+|      771|
++---------+
+
+
+scala> val out1= output1.write.format("text").option("header","false").save("C:/
+Users/Giray/Desktop/output1.txt")
+[Stage 49:=>                                                      (4 + 4) / 200]
+[Stage 49:==>                                                     (8 + 4) / 200]
+[Stage 49:===>                                                   (12 + 4) / 200]
+[Stage 49:====>                                                  (16 + 4) / 200]
+[Stage 49:=====>                                                 (20 + 4) / 200]
+[Stage 49:======>                                                (25 + 4) / 200]
+[Stage 49:========>                                              (31 + 4) / 200]
+[Stage 49:=========>                                             (36 + 4) / 200]
+[Stage 49:===========>                                           (40 + 4) / 200]
+[Stage 49:=============>                                         (48 + 4) / 200]
+[Stage 49:==============>                                        (51 + 4) / 200]
+[Stage 49:===============>                                       (57 + 4) / 200]
+[Stage 49:=================>                                     (64 + 4) / 200]
+[Stage 49:==================>                                    (69 + 4) / 200]
+[Stage 49:=====================>                                 (77 + 4) / 200]
+[Stage 49:=======================>                               (85 + 4) / 200]
+[Stage 49:=========================>                             (92 + 4) / 200]
+[Stage 49:===========================>                           (99 + 4) / 200]
+[Stage 49:============================>                         (105 + 4) / 200]
+[Stage 49:=============================>                        (110 + 4) / 200]
+[Stage 49:===============================>                      (115 + 4) / 200]
+[Stage 49:================================>                     (119 + 4) / 200]
+[Stage 49:=================================>                    (123 + 4) / 200]
+[Stage 49:===================================>                  (130 + 4) / 200]
+[Stage 49:====================================>                 (136 + 4) / 200]
+[Stage 49:======================================>               (144 + 4) / 200]
+[Stage 49:===========================================>          (162 + 4) / 200]
+[Stage 49:================================================>     (179 + 4) / 200]
+
+out1: Unit = ()
+
+scala> val out2= output2.write.format("text").option("header","false").save("C:/
+Users/Giray/Desktop/output2.txt")
+[Stage 51:======>                                                (25 + 4) / 200]
+[Stage 51:=============>                                         (50 + 5) / 200]
+[Stage 51:=====================>                                 (78 + 4) / 200]
+[Stage 51:=============================>                        (108 + 4) / 200]
+[Stage 51:==================================>                   (129 + 4) / 200]
+[Stage 51:======================================>               (143 + 5) / 200]
+[Stage 51:===========================================>          (160 + 4) / 200]
+[Stage 51:================================================>     (178 + 4) / 200]
+[Stage 51:===================================================>  (192 + 4) / 200]
+
+out2: Unit = ()
+
+scala> val out3= output3.write.format("text").option("header","false").save("C:/
+Users/Giray/Desktop/output3.txt")
+[Stage 53:===============>                                       (58 + 4) / 200]
+[Stage 53:======================>                                (82 + 4) / 200]
+[Stage 53:==========================>                            (96 + 4) / 200]
+[Stage 53:==============================>                       (114 + 4) / 200]
+[Stage 53:==================================>                   (127 + 4) / 200]
+[Stage 53:=====================================>                (139 + 4) / 200]
+[Stage 53:==========================================>           (156 + 4) / 200]
+[Stage 53:==============================================>       (173 + 4) / 200]
+[Stage 54:=============================>                        (111 + 4) / 200]
+[Stage 54:=============================================>        (169 + 4) / 200]
+
+out3: Unit = ()
+
+scala> val out4= output4.write.format("text").option("header","false").save("C:/
+Users/Giray/Desktop/output4.txt")
+[Stage 57:======>                                                (23 + 5) / 200]
+[Stage 57:=============>                                         (49 + 4) / 200]
+[Stage 57:===================>                                   (72 + 5) / 200]
+[Stage 57:===========================>                          (103 + 4) / 200]
+[Stage 57:==================================>                   (127 + 4) / 200]
+[Stage 57:=========================================>            (154 + 4) / 200]
+[Stage 57:===============================================>      (175 + 4) / 200]
+[Stage 57:===================================================>  (192 + 4) / 200]
+
+out4: Unit = ()
+
+scala> val out5= output5.write.format("text").option("header","false").save("C:/
+Users/Giray/Desktop/output5.txt")
+[Stage 59:==========>                                            (37 + 4) / 200]
+[Stage 59:================>                                      (61 + 5) / 200]
+[Stage 59:========================>                              (88 + 5) / 200]
+[Stage 59:===============================>                      (115 + 4) / 200]
+[Stage 59:======================================>               (141 + 4) / 200]
+[Stage 59:============================================>         (166 + 4) / 200]
+[Stage 59:===================================================>  (189 + 4) / 200]
+
+out5: Unit = ()
